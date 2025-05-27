@@ -12,6 +12,7 @@ import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.SystemConfig.Aliases.Mode;
 
 public class Robot extends LoggedRobot {
 
@@ -31,14 +32,14 @@ public class Robot extends LoggedRobot {
         }
 
         // Set up data receivers & replay source
-        if (SystemConfig.mode == 0){
+        if (SystemConfig.robotMode == Mode.REAL){
             // Running on a real robot, log to a USB stick ("/U/logs")
             Logger.addDataReceiver(new WPILOGWriter());
             Logger.addDataReceiver(new NT4Publisher());
-        } else if (SystemConfig.mode == 1) {
+        } else if (SystemConfig.robotMode == Mode.SIM) {
             // Running a physics simulator, log to NT
             Logger.addDataReceiver(new NT4Publisher());
-        } else if (SystemConfig.mode == 2) {
+        } else if (SystemConfig.robotMode == Mode.REPLAY) {
             // Replaying a log, set up replay source
             setUseTiming(false); // Run as fast as possible
             String logPath = LogFileUtil.findReplayLog();
@@ -47,50 +48,52 @@ public class Robot extends LoggedRobot {
         }
         // Start AdvantageKit logger
         Logger.start();
-  }
 
-  @Override
-  public void robotPeriodic() {
-    CommandScheduler.getInstance().run();
-  }
+        // Subsystem Instantiation
+    }
 
-  @Override
-  public void disabledInit() {}
+    @Override
+    public void robotPeriodic() {
+        CommandScheduler.getInstance().run();
+    }
 
-  @Override
-  public void disabledPeriodic() {}
+    @Override
+    public void disabledInit() {}
 
-  @Override
-  public void disabledExit() {}
+    @Override
+    public void disabledPeriodic() {}
 
-  @Override
-  public void autonomousInit() {
-  }
+    @Override
+    public void disabledExit() {}
 
-  @Override
-  public void autonomousPeriodic() {}
+    @Override
+    public void autonomousInit() {
+    }
 
-  @Override
-  public void autonomousExit() {}
+    @Override
+    public void autonomousPeriodic() {}
 
-  @Override
-  public void teleopInit() {
-  }
+    @Override
+    public void autonomousExit() {}
 
-  @Override
-  public void teleopPeriodic() {}
+    @Override
+    public void teleopInit() {
+    }
 
-  @Override
-  public void teleopExit() {}
+    @Override
+    public void teleopPeriodic() {}
 
-  @Override
-  public void testInit() {
-    CommandScheduler.getInstance().cancelAll();
-  }
+    @Override
+    public void teleopExit() {}
 
-  @Override
-  public void testPeriodic() {}
+    @Override
+    public void testInit() {
+        CommandScheduler.getInstance().cancelAll();
+    }
 
-  @Override
-  public void testExit() {}
+    @Override
+    public void testPeriodic() {}
+
+    @Override
+    public void testExit() {}
 }

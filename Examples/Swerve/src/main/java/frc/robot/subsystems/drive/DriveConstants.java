@@ -1,12 +1,22 @@
 package frc.robot.subsystems.drive;
 
 
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 
 public final class DriveConstants {
 
     public static final int kOdometryFrequencyHz = 250;
     public static final int kGyroPort = 9;
+
+    public static final double kWheelBase = Units.inchesToMeters(27.5); //Meters
+    public static final double kTrackWidth = Units.inchesToMeters(19.5); //Meters
+    public static final Translation2d[] kModuleTranslations = new Translation2d[] {
+        new Translation2d(kTrackWidth / 2.0, kWheelBase / 2.0),
+        new Translation2d(kTrackWidth / 2.0, -kWheelBase / 2.0),
+        new Translation2d(-kTrackWidth / 2.0, kWheelBase / 2.0),
+        new Translation2d(-kTrackWidth / 2.0, -kWheelBase / 2.0)
+    };
     
     public static class ModuleK {
         

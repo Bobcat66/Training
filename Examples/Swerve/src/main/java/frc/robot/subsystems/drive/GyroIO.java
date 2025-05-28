@@ -33,5 +33,7 @@ public interface GyroIO {
     
     public abstract void updateInputs(GyroIOInputs inputs);
 
+    public abstract Rotation2d getYaw(); // Returns the current yaw immediately
+
     public abstract void rezero();
 }

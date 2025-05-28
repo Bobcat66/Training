@@ -56,4 +56,9 @@ public class GyroIOPigeon2 implements GyroIO {
             .toArray(Rotation2d[]::new);
     }
 
+    @Override
+    public Rotation2d getYaw() {
+        return new Rotation2d(yaw.getValue());
+    }
+
 }

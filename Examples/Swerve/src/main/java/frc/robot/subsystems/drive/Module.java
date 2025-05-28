@@ -38,6 +38,20 @@ public class Module {
         }
     }
 
+    public SwerveModulePosition getPosition() {
+        return new SwerveModulePosition(
+            inputs.data.driveRotations() * rotationsToMeters, // Convert rotations to meters
+            inputs.data.steerHeading() // Use the steer heading directly
+        ); // Returns the current position of the module
+    }
+
+    public SwerveModuleState getState() {
+        return new SwerveModuleState(
+            inputs.data.driveVelocityRPM() * rotationsToMeters / 60.0, // Convert RPM to m/s
+            inputs.data.steerHeading()
+        ); // Returns the current state of the module
+    }
+
     public SwerveModulePosition[] getOdometryPositions() {
         if (odometryPositions.length == 0) {
             buildOdometryPositions(); // Ensure positions are built if not already done
@@ -66,7 +80,11 @@ public class Module {
     }
 
     public void setTargetState(SwerveModuleState targetState){
-        setTargetState(targetState, Newtons.of(0.0)); // Default to zero force if not specified
+        targetState.optimize(inputs.data.steerHeading());
+        double driveVelocityRPM = (targetState.speedMetersPerSecond * 60) / rotationsToMeters; // Convert m/s to RPM
+        double FFVolts = ffModel.calculate(targetState.speedMetersPerSecond); // Convert torque to volts
+        io.setDriveVelocity(driveVelocityRPM, FFVolts);
+        io.setSteerHeading(targetState.angle.getRotations());
     }
 
 

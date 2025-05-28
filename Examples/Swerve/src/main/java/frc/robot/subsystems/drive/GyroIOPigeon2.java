@@ -34,12 +34,6 @@ public class GyroIOPigeon2 implements GyroIO {
     }
 
     @Override
-    public void rezero() {
-        // Reset the Pigeon2's yaw to 0 degrees
-        m_pigeon.getConfigurator().setYaw(0.0);
-    }
-
-    @Override
     public void updateInputs(GyroIOInputs inputs) {
         inputs.data = new GyroIOData(
             m_pigeon.isConnected(),
@@ -54,11 +48,6 @@ public class GyroIOPigeon2 implements GyroIO {
         inputs.odometryYawPositions = odometryYawPositionsRadians.stream()
             .map(Rotation2d::fromRadians)
             .toArray(Rotation2d[]::new);
-    }
-
-    @Override
-    public Rotation2d getYaw() {
-        return new Rotation2d(yaw.getValue());
     }
 
 }

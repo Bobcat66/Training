@@ -2,10 +2,17 @@ package frc.robot.subsystems.drive;
 
 import org.littletonrobotics.junction.Logger;
 
+import edu.wpi.first.math.Vector;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Twist2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.numbers.N3;
+import edu.wpi.first.units.measure.Force;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Drive extends SubsystemBase {
@@ -21,13 +28,14 @@ public class Drive extends SubsystemBase {
         new SwerveModulePosition()
     }; //For delta tracking
     private final SwerveDrivePoseEstimator poseEstimator;
+    private Rotation2d rawGyroHeading = new Rotation2d();
 
     public Drive(GyroIO gyroIO, Module... modules) {
         this.modules = modules;
         this.gyroIO = gyroIO;
         poseEstimator = new SwerveDrivePoseEstimator(
             kinematics, 
-            gyroIO.getYaw(), 
+            rawGyroHeading, 
             lastModulePositions,
             new Pose2d() // In a real competition bot, the initial pose would likely come from the driver station
         );
@@ -48,5 +56,83 @@ public class Drive extends SubsystemBase {
         for (var module: modules) {
             module.periodic();
         }
+
+        // Update the pose estimator with the latest module positions and gyro data
+        int sampleCount = OdometryThread.getInstance().getSampleCount();
+        for (int i = 0; i < sampleCount; i++) {
+            SwerveModulePosition[] modulePositions = new SwerveModulePosition[4];
+            SwerveModulePosition[] moduleDeltas = new SwerveModulePosition[4];
+            for (int modIndex = 0; modIndex < 4; modIndex++){
+                modulePositions[modIndex] = modules[modIndex].getOdometryPositions()[i];
+                moduleDeltas[modIndex] = new SwerveModulePosition(
+                    modulePositions[modIndex].distanceMeters - lastModulePositions[modIndex].distanceMeters,
+                    modulePositions[modIndex].angle);
+                lastModulePositions[modIndex] = modulePositions[modIndex];
+            }
+            if (gyroInputs.data.connected()) {
+                // Use the real gyro angle
+                rawGyroHeading = gyroInputs.odometryYawPositions[i];
+            } else {
+                // Use the angle delta from the kinematics and module deltas
+                Twist2d twist = kinematics.toTwist2d(moduleDeltas);
+                rawGyroHeading = rawGyroHeading.plus(new Rotation2d(twist.dtheta));
+            }
+            poseEstimator.updateWithTime(timestamps[i],rawGyroHeading,modulePositions);
+        }
+    }
+
+    public void resetRotation(Rotation2d rotation) {
+        poseEstimator.resetRotation(rotation);
+    }
+
+    public void seedPoseEstimate(Pose2d pose) {
+        poseEstimator.resetPosition(rawGyroHeading,lastModulePositions,pose);
+    }
+
+    public void recalculateGyroOffset() {
+        poseEstimator.resetPosition(rawGyroHeading, lastModulePositions, poseEstimator.getEstimatedPosition());
+    }
+
+    public Pose2d getPose() {
+        return poseEstimator.getEstimatedPosition();
+    }
+
+    public Rotation2d getHeading() {
+        return poseEstimator.getEstimatedPosition().getRotation();
+    }
+
+    public void addVisionMeasurement(Pose2d pose, double timestamp) {
+        poseEstimator.addVisionMeasurement(pose, timestamp);
+    }
+
+    public void addVisionMeasurement(Pose2d pose, double timestamp, Vector<N3> stddevs) {
+        poseEstimator.addVisionMeasurement(pose, timestamp, stddevs);
+    }
+
+    public void applyRobotSpeeds(ChassisSpeeds speeds, Force[] wheelForces) {
+        SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
+        SwerveDriveKinematics.desaturateWheelSpeeds(states, DriveConstants.ModuleK.Common.kMaxModuleSpeed);
+        for (int i = 0; i < modules.length; i++) {
+            modules[i].setTargetState(states[i],wheelForces[i]);
+        }
+    }
+
+    public void applyRobotSpeeds(ChassisSpeeds robotSpeeds){
+        ChassisSpeeds desatSpeeds = desaturateSpeeds(robotSpeeds);
+        SwerveModuleState[] discreteStates = kinematics.toSwerveModuleStates(ChassisSpeeds.discretize(desatSpeeds, 0.02));
+        for (int i = 0; i < modules.length; i++) {
+            modules[i].setTargetState(discreteStates[i]);
+        }
+    }
+
+    private ChassisSpeeds desaturateSpeeds(ChassisSpeeds speeds) {
+        // Scales the chassis speeds to ensure that no individual module exceeds the maximum module speed
+        SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
+        SwerveDriveKinematics.desaturateWheelSpeeds(states, DriveConstants.ModuleK.Common.kMaxModuleSpeed);
+        return kinematics.toChassisSpeeds(states);
+    }
+
+    public void applyFieldSpeeds(ChassisSpeeds fieldSpeeds){
+        ChassisSpeeds robotSpeeds = ChassisSpeeds.
     }
 }

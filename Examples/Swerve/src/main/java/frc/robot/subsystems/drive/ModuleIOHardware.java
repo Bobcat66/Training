@@ -22,17 +22,17 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Angle;
-import frc.robot.subsystems.drive.DriveConstants.ModuleK.Common.DriveMotorK;
-import frc.robot.subsystems.drive.DriveConstants.ModuleK.Common.SteerMotorK;
-import frc.robot.subsystems.drive.DriveConstants.ModuleK.ModuleConfig;
-import static frc.robot.subsystems.drive.DriveConstants.kOdometryFrequencyHz;
+import frc.robot.subsystems.drive.DriveConfig.ModuleK.Common.DriveMotorK;
+import frc.robot.subsystems.drive.DriveConfig.ModuleK.Common.SteerMotorK;
+import frc.robot.subsystems.drive.DriveConfig.ModuleK.ModuleConfig;
+import static frc.robot.subsystems.drive.DriveConfig.kOdometryFrequencyHz;
 
 public class ModuleIOHardware implements ModuleIO {
 
     private final SparkMax m_driveMotor;
     private final SparkClosedLoopController m_driveController;
     private final RelativeEncoder m_driveEncoder;
-    
+
     private final SparkMax m_steerMotor;
     private final SparkClosedLoopController m_steerController;
     private final RelativeEncoder m_steerEncoder;
@@ -70,7 +70,7 @@ public class ModuleIOHardware implements ModuleIO {
         steerAbsolutePosition = m_steerCANcoder.getAbsolutePosition();
 
         // Drive motor configuration
-        double driveConversionFactor = 1/DriveMotorK.kGearRatio;
+        double driveConversionFactor = 1/DriveMotorK.kGearReduction;
         SparkMaxConfig driveConfig = new SparkMaxConfig();
         driveConfig
             .idleMode(IdleMode.kBrake)

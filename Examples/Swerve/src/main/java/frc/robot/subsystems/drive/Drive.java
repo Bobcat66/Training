@@ -1,5 +1,7 @@
 package frc.robot.subsystems.drive;
 
+import java.util.function.DoubleSupplier;
+
 import org.littletonrobotics.junction.Logger;
 
 import edu.wpi.first.math.Vector;
@@ -13,6 +15,7 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.numbers.N3;
 import edu.wpi.first.units.measure.Force;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Drive extends SubsystemBase {
@@ -20,7 +23,7 @@ public class Drive extends SubsystemBase {
     private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
     private final Module[] modules;
     private final GyroIO gyroIO;
-    private final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(DriveConstants.kModuleTranslations);
+    private final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(DriveConfig.kModuleTranslations);
     private SwerveModulePosition[] lastModulePositions = new SwerveModulePosition[] {
         new SwerveModulePosition(),
         new SwerveModulePosition(),
@@ -85,6 +88,11 @@ public class Drive extends SubsystemBase {
         poseEstimator.resetRotation(rotation);
     }
 
+    public void resetPose(Pose2d pose) {
+        // Resets the pose estimator to a specific pose
+        poseEstimator.resetPose(pose);
+    }
+
     public void seedPoseEstimate(Pose2d pose) {
         poseEstimator.resetPosition(rawGyroHeading,lastModulePositions,pose);
     }
@@ -101,6 +109,20 @@ public class Drive extends SubsystemBase {
         return poseEstimator.getEstimatedPosition().getRotation();
     }
 
+    public Rotation2d getAllianceHeading() {
+        // Returns the heading adjusted for the alliance color
+        if (DriverStation.getAlliance().isPresent()) {
+            return getHeading().plus(
+                DriverStation.getAlliance().get() == DriverStation.Alliance.Red
+                    ? Rotation2d.k180deg // Red alliance is 180 degrees offset
+                    : Rotation2d.kZero // Blue alliance is no offset
+            );
+        } else {
+            return getHeading();
+        }
+
+    }
+
     public void addVisionMeasurement(Pose2d pose, double timestamp) {
         poseEstimator.addVisionMeasurement(pose, timestamp);
     }
@@ -109,30 +131,29 @@ public class Drive extends SubsystemBase {
         poseEstimator.addVisionMeasurement(pose, timestamp, stddevs);
     }
 
-    public void applyRobotSpeeds(ChassisSpeeds speeds, Force[] wheelForces) {
-        SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
-        SwerveDriveKinematics.desaturateWheelSpeeds(states, DriveConstants.ModuleK.Common.kMaxModuleSpeed);
-        for (int i = 0; i < modules.length; i++) {
-            modules[i].setTargetState(states[i],wheelForces[i]);
-        }
-    }
-
     public void applyRobotSpeeds(ChassisSpeeds robotSpeeds){
-        ChassisSpeeds desatSpeeds = desaturateSpeeds(robotSpeeds);
-        SwerveModuleState[] discreteStates = kinematics.toSwerveModuleStates(ChassisSpeeds.discretize(desatSpeeds, 0.02));
+        ChassisSpeeds.discretize(robotSpeeds, 0.02); // Discretize the speeds to reduce translational skew (Note, desaturation may reintroduce skew).
+        SwerveModuleState[] discreteStates = kinematics.toSwerveModuleStates(robotSpeeds);
         for (int i = 0; i < modules.length; i++) {
             modules[i].setTargetState(discreteStates[i]);
         }
     }
 
-    private ChassisSpeeds desaturateSpeeds(ChassisSpeeds speeds) {
-        // Scales the chassis speeds to ensure that no individual module exceeds the maximum module speed
-        SwerveModuleState[] states = kinematics.toSwerveModuleStates(speeds);
-        SwerveDriveKinematics.desaturateWheelSpeeds(states, DriveConstants.ModuleK.Common.kMaxModuleSpeed);
-        return kinematics.toChassisSpeeds(states);
+    public void applyRobotSpeeds(ChassisSpeeds robotSpeeds, Force[] wheelForces){
+        ChassisSpeeds.discretize(robotSpeeds, 0.02); // Discretize the speeds to reduce translational skew (Note, desaturation may reintroduce skew)
+        SwerveModuleState[] discreteStates = kinematics.toSwerveModuleStates(robotSpeeds);
+        for (int i = 0; i < modules.length; i++) {
+            modules[i].setTargetState(discreteStates[i],wheelForces[i]);
+        }
     }
 
     public void applyFieldSpeeds(ChassisSpeeds fieldSpeeds){
-        ChassisSpeeds robotSpeeds = ChassisSpeeds.
+        ChassisSpeeds robotSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(fieldSpeeds, getAllianceHeading());
+        applyRobotSpeeds(robotSpeeds);
+    }
+
+    public void applyFieldSpeeds(ChassisSpeeds fieldSpeeds, Force[] wheelForces){
+        ChassisSpeeds robotSpeeds = ChassisSpeeds.fromFieldRelativeSpeeds(fieldSpeeds, getAllianceHeading());
+        applyRobotSpeeds(robotSpeeds,wheelForces);
     }
 }

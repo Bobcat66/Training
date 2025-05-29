@@ -2,9 +2,11 @@ package frc.robot.subsystems.drive;
 
 
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 
-public final class DriveConstants {
+// Constants directly needed for the subsystem. The global driveconstants class contains drive constants that are not directly associated with setting up the subsystem
+public final class DriveConfig {
 
     public static final int kOdometryFrequencyHz = 250;
     public static final int kGyroPort = 9;
@@ -25,13 +27,13 @@ public final class DriveConstants {
             public static final double kMaxModuleSpeed = 14.0; // Maximum attainable module speed (Meters per second)
             public static final double kWheelRadius = Units.inchesToMeters(4); //Meters
             public static final double kWheelCOF = 1.0; //Coefficient of friction
-            public static final double kT = 0.1; // Torque constant for force-based feedforward (Volts per Newton-meter)
 
             public static class DriveMotorK {
+                public static final DCMotor kMotorModel = DCMotor.getNEO(1); // Motor model for the drive motor
                 public static final int kCurrentLimit = 60;
                 public static final boolean kVoltageCompensation = true;
                 public static final double kNominalVoltage = 12.0;
-                public static final double kGearRatio = 6.75;
+                public static final double kGearReduction = 6.75;
 
                 //PID constants
                 public static final double kP = 0.035;
@@ -41,10 +43,11 @@ public final class DriveConstants {
                 //Feedforward constants
                 public static final double kS = 0.0;
                 public static final double kV = 2.78;
-                public static final double kA = 0.0;
+
             }
 
             public static class SteerMotorK {
+                public static final DCMotor kMotorModel = DCMotor.getNEO(1); // Motor model for the steer motor
                 public static final int kCurrentLimit = 60;
                 public static final boolean kVoltageCompensation = true;
                 public static final double kNominalVoltage = 12;
@@ -59,10 +62,6 @@ public final class DriveConstants {
                 public static final double kS = 0.0;
                 public static final double kV = 2.78;
                 public static final double kA = 0.0;
-
-                // Motion profile constraints
-                public static final double maxVelocityRPM = 3600.0;
-                public static final double maxAccelerationRPMPS = 60.0;
             }
         }
         public static enum ModuleConfig {

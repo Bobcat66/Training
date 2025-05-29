@@ -12,7 +12,7 @@ import java.util.stream.DoubleStream;
 
 import edu.wpi.first.wpilibj.Notifier;
 import edu.wpi.first.wpilibj.RobotController;
-import static frc.robot.subsystems.drive.DriveConstants.kOdometryFrequencyHz;
+import static frc.robot.subsystems.drive.DriveConfig.kOdometryFrequencyHz;
 
 /**An odometry thread designed to work with SparkMax motor controllers. This is a singleton class, only one instance exists at any given time*/
 public class OdometryThread {

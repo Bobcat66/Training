@@ -5,19 +5,22 @@ import org.littletonrobotics.junction.Logger;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.math.system.plant.DCMotor;
 import static edu.wpi.first.units.Units.Newtons;
 import edu.wpi.first.units.measure.Force;
-import frc.robot.subsystems.drive.DriveConstants.ModuleK.Common.DriveMotorK;
-import static frc.robot.subsystems.drive.DriveConstants.ModuleK.Common.kT;
-import static frc.robot.subsystems.drive.DriveConstants.ModuleK.Common.kWheelRadius;
+import frc.robot.subsystems.drive.DriveConfig.ModuleK.Common.DriveMotorK;
+import frc.robot.subsystems.drive.DriveConfig.ModuleK.Common.SteerMotorK;
+
+import static frc.robot.subsystems.drive.DriveConfig.ModuleK.Common.kWheelRadius;
 public class Module {
 
     private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();
     private final ModuleIO io;
 
-    private final SimpleMotorFeedforward ffModel = new SimpleMotorFeedforward(
-        DriveMotorK.kS, DriveMotorK.kV, DriveMotorK.kA
-    );
+    private final SimpleMotorFeedforward ffModel = new SimpleMotorFeedforward(DriveMotorK.kS, DriveMotorK.kV);
+    
+    private final DCMotor m_driveGearbox = DriveMotorK.kMotorModel.withReduction(DriveMotorK.kGearReduction);
+    private final DCMotor m_steerGearbox = SteerMotorK.kMotorModel.withReduction(SteerMotorK.kGearRatio);
 
     private final double rotationsToMeters = Math.PI * 2.0 * kWheelRadius; // Conversion factor from rotations to meters
 
@@ -69,12 +72,11 @@ public class Module {
         return io.getName();
     }
 
-    // wheelforce for force-based feedforward
-    public void setTargetState(SwerveModuleState targetState, Force wheelforce) {
-        double wheelTorqueNm = wheelforce.in(Newtons) * kWheelRadius; // Convert linear force to torque
+    public void setTargetState(SwerveModuleState targetState, Force driveForce) {
         targetState.optimize(inputs.data.steerHeading());
+        double driveTorqueNm = driveForce.in(Newtons) * kWheelRadius; // Convert force to torque
         double driveVelocityRPM = (targetState.speedMetersPerSecond * 60) / rotationsToMeters; // Convert m/s to RPM
-        double FFVolts = ffModel.calculate(targetState.speedMetersPerSecond) + (wheelTorqueNm * kT); // Convert torque to volts
+        double FFVolts = ffModel.calculate(driveVelocityRPM) + m_driveGearbox.rOhms * (driveTorqueNm / m_driveGearbox.KtNMPerAmp); // Convert torque to volts
         io.setDriveVelocity(driveVelocityRPM, FFVolts);
         io.setSteerHeading(targetState.angle.getRotations());
     }

@@ -12,9 +12,9 @@ import edu.wpi.first.math.util.Units;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
-import static frc.robot.subsystems.drive.DriveConstants.kGyroPort;
+import static frc.robot.subsystems.drive.DriveConfig.kGyroPort;
 
-public class GyroIOPigeon2 implements GyroIO {
+public class GyroIOHardware implements GyroIO {
     private final Pigeon2 m_pigeon = new Pigeon2(kGyroPort);
     private final StatusSignal<Angle> yaw = m_pigeon.getYaw();
     private final StatusSignal<Angle> pitch = m_pigeon.getPitch();
@@ -24,10 +24,10 @@ public class GyroIOPigeon2 implements GyroIO {
     private final StatusSignal<AngularVelocity> rollVelocity = m_pigeon.getAngularVelocityYWorld();
     private final ConcurrentLinkedQueue<Double> odometryYawPositionsRadians;
 
-    public GyroIOPigeon2() {
+    public GyroIOHardware() {
         m_pigeon.getConfigurator().apply(new Pigeon2Configuration());
         m_pigeon.getConfigurator().setYaw(0.0);
-        yaw.setUpdateFrequency(DriveConstants.kOdometryFrequencyHz);
+        yaw.setUpdateFrequency(DriveConfig.kOdometryFrequencyHz);
         BaseStatusSignal.setUpdateFrequencyForAll(50, pitch, roll, yawVelocity, pitchVelocity, rollVelocity);
         m_pigeon.optimizeBusUtilization();
         odometryYawPositionsRadians = OdometryThread.getInstance().registerSignal(() -> Units.degreesToRadians(yaw.getValueAsDouble()));

@@ -13,8 +13,15 @@ import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.SystemConfig.Aliases.Mode;
+import frc.robot.subsystems.drive.Drive;
+import frc.robot.subsystems.drive.DriveConfig;
+import frc.robot.subsystems.drive.DriveConfig.ModuleK.ModuleConfig;
+import frc.robot.subsystems.drive.GyroIOHardware;
+import frc.robot.subsystems.drive.ModuleIOHardware;
 
 public class Robot extends LoggedRobot {
+
+    private final Drive m_drive;
 
     @SuppressWarnings("unused")
     public Robot() {
@@ -50,6 +57,15 @@ public class Robot extends LoggedRobot {
         Logger.start();
 
         // Subsystem Instantiation
+
+        // TODO: Add sim support
+        m_drive = new Drive(
+            new GyroIOHardware(), // Replace with actual GyroIO implementation
+            new Module(new ModuleIOHardware(ModuleConfig.FrontLeft)), // Replace with actual ModuleIO implementation
+            new Module(new ModuleIOHardware(ModuleConfig.FrontRight)),
+            new Module(new ModuleIOHardware(ModuleConfig.RearLeft)),
+            new Module(new ModuleIOHardware(ModuleConfig.RearRight))
+        );
     }
 
     @Override

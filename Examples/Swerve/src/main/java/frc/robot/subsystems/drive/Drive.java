@@ -18,6 +18,11 @@ import edu.wpi.first.units.measure.Force;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+/*
+ * This is the main drive subsystem. This class handles the overall swerve drive logic,
+ * including keeping track of the robot's pose, converting robot speeds into swerve module commands,
+ * and exposing an interface to allow other parts of the code to interact with the drive system.
+ */
 public class Drive extends SubsystemBase {
     
     private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
@@ -30,6 +35,9 @@ public class Drive extends SubsystemBase {
         new SwerveModulePosition(),
         new SwerveModulePosition()
     }; //For delta tracking
+
+    // The pose estimator uses odometry data from the modules to estimate the robot's pose. Over time,
+    // the pose estimate will drift using odometry alone, so the pose estimator fuses vision pose estimates with the odometry
     private final SwerveDrivePoseEstimator poseEstimator;
     private Rotation2d rawGyroHeading = new Rotation2d();
 
@@ -43,15 +51,23 @@ public class Drive extends SubsystemBase {
             new Pose2d() // In a real competition bot, the initial pose would likely come from the driver station
         );
         
-        OdometryThread.getInstance().start(); // Start the odometry thread
+        /*
+         * The odometry thread reads data from the sensors at a higher rate than the main loop, so that the odometry estimate is
+         * more accurate, as it relies on numerical integration of sensor data over time to approximate the robot's true pose.
+         * Specifically, it keeps track of the previous module position given to it, and when given a new module position, it calculates a
+         * "twist" (the derivative of a pose, i.e. the robot's instantaneous velocity) and numerically integrates those twists over time to get the new pose.
+         */
+        OdometryThread.getInstance().start();
     }
     
     @Override
     public void periodic() {
         // This method will be called once per scheduler run
+
+        // This method signals to the odometry thread that a main loop cycle has completed. It is imperative that
+        // this metho is called BEFORE any data is accessed from the Odometry thread
         double[] timestamps = OdometryThread.getInstance().poll();
 
-        // Rest of periodic code goes here
         // Logs data from the gyroscope
         gyroIO.updateInputs(gyroInputs);
         Logger.processInputs("Drive/Gyro", gyroInputs);
@@ -84,15 +100,19 @@ public class Drive extends SubsystemBase {
         }
     }
 
+    // This method resets the pose estimator's rotation to a specific angle.
     public void resetRotation(Rotation2d rotation) {
         poseEstimator.resetRotation(rotation);
     }
 
+    
+    // This method resets the pose estimator to a specific pose
     public void resetPose(Pose2d pose) {
-        // Resets the pose estimator to a specific pose
         poseEstimator.resetPose(pose);
     }
 
+    // This method seeds the pose estimate with a new initial pose. Because the pose estimator works by integrating
+    // module positions over time, it is crucial that this initial pose is accurate.
     public void seedPoseEstimate(Pose2d pose) {
         poseEstimator.resetPosition(rawGyroHeading,lastModulePositions,pose);
     }

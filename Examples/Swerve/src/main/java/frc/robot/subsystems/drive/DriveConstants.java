@@ -5,7 +5,11 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 
-// Constants directly needed for the subsystem. The global driveconstants class contains drive constants that are not directly associated with setting up the subsystem
+/* 
+ * This is the DriveConstants file
+ * 
+ * This file contains constant values needed to set up and configure the drivetrain properly
+ */
 public final class DriveConstants {
 
     public static final int kOdometryFrequencyHz = 250;

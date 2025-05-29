@@ -11,15 +11,15 @@ public final class DriveCommands {
     private DriveCommands () {}
 
     public static Command driveFieldRelative(
-        DoubleSupplier xSupplier, 
-        DoubleSupplier ySupplier, 
+        DoubleSupplier xSpeedSupplier, 
+        DoubleSupplier ySpeedSupplier, 
         DoubleSupplier omegaSupplier,
         Drive drive
     ) {
         return drive.run(() -> {
             var speeds = new ChassisSpeeds(
-                xSupplier.getAsDouble(), 
-                ySupplier.getAsDouble(), 
+                xSpeedSupplier.getAsDouble(), 
+                ySpeedSupplier.getAsDouble(), 
                 omegaSupplier.getAsDouble()
             );
             drive.applyFieldSpeeds(speeds);
@@ -27,15 +27,15 @@ public final class DriveCommands {
     }
 
     public static Command driveRobotRelative(
-        DoubleSupplier xSupplier, 
-        DoubleSupplier ySupplier, 
+        DoubleSupplier xSpeedSupplier, 
+        DoubleSupplier ySpeedSupplier, 
         DoubleSupplier omegaSupplier,
         Drive drive
     ) {
         return drive.run(() -> {
             var speeds = new ChassisSpeeds(
-                xSupplier.getAsDouble(), 
-                ySupplier.getAsDouble(), 
+                xSpeedSupplier.getAsDouble(), 
+                ySpeedSupplier.getAsDouble(), 
                 omegaSupplier.getAsDouble()
             );
             drive.applyRobotSpeeds(speeds);

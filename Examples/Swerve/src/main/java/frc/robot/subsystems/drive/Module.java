@@ -8,10 +8,9 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.system.plant.DCMotor;
 import static edu.wpi.first.units.Units.Newtons;
 import edu.wpi.first.units.measure.Force;
-import frc.robot.subsystems.drive.DriveConfig.ModuleK.Common.DriveMotorK;
-import frc.robot.subsystems.drive.DriveConfig.ModuleK.Common.SteerMotorK;
-
-import static frc.robot.subsystems.drive.DriveConfig.ModuleK.Common.kWheelRadius;
+import frc.robot.subsystems.drive.DriveConstants.ModuleK.Common.DriveMotorK;
+import frc.robot.subsystems.drive.DriveConstants.ModuleK.Common.SteerMotorK;
+import static frc.robot.subsystems.drive.DriveConstants.ModuleK.Common.kWheelRadius;
 public class Module {
 
     private final ModuleIOInputsAutoLogged inputs = new ModuleIOInputsAutoLogged();

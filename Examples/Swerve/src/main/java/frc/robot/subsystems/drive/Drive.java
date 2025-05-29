@@ -23,7 +23,7 @@ public class Drive extends SubsystemBase {
     private final GyroIOInputsAutoLogged gyroInputs = new GyroIOInputsAutoLogged();
     private final Module[] modules;
     private final GyroIO gyroIO;
-    private final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(DriveConfig.kModuleTranslations);
+    private final SwerveDriveKinematics kinematics = new SwerveDriveKinematics(DriveConstants.kModuleTranslations);
     private SwerveModulePosition[] lastModulePositions = new SwerveModulePosition[] {
         new SwerveModulePosition(),
         new SwerveModulePosition(),

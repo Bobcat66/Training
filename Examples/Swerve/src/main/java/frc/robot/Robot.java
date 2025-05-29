@@ -11,17 +11,25 @@ import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGReader;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import static frc.robot.Constants.IO.kControllerDeadband;
+import static frc.robot.Constants.IO.kDriverControllerPort;
+import static frc.robot.Constants.TeleopDriveK.kMaxAngularSpeed;
+import static frc.robot.Constants.TeleopDriveK.kMaxLinearSpeed;
 import frc.robot.SystemConfig.Aliases.Mode;
+import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.drive.DriveConfig;
-import frc.robot.subsystems.drive.DriveConfig.ModuleK.ModuleConfig;
+import frc.robot.subsystems.drive.DriveConstants.ModuleK.ModuleConfig;
 import frc.robot.subsystems.drive.GyroIOHardware;
+import frc.robot.subsystems.drive.Module;
 import frc.robot.subsystems.drive.ModuleIOHardware;
 
 public class Robot extends LoggedRobot {
 
     private final Drive m_drive;
+    private final CommandXboxController m_driverController = new CommandXboxController(kDriverControllerPort);
 
     @SuppressWarnings("unused")
     public Robot() {
@@ -65,6 +73,15 @@ public class Robot extends LoggedRobot {
             new Module(new ModuleIOHardware(ModuleConfig.FrontRight)),
             new Module(new ModuleIOHardware(ModuleConfig.RearLeft)),
             new Module(new ModuleIOHardware(ModuleConfig.RearRight))
+        );
+
+        m_drive.setDefaultCommand(
+            DriveCommands.driveFieldRelative(
+                () -> MathUtil.applyDeadband(m_driverController.getLeftX(), kControllerDeadband) * kMaxLinearSpeed, 
+                () -> MathUtil.applyDeadband(m_driverController.getLeftY(), kControllerDeadband) * kMaxLinearSpeed,
+                () -> MathUtil.applyDeadband(m_driverController.getRightX(), kControllerDeadband) * kMaxAngularSpeed, 
+                m_drive
+            )
         );
     }
 

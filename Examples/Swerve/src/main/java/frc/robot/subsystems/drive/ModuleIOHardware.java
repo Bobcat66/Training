@@ -22,10 +22,10 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Angle;
-import frc.robot.subsystems.drive.DriveConfig.ModuleK.Common.DriveMotorK;
-import frc.robot.subsystems.drive.DriveConfig.ModuleK.Common.SteerMotorK;
-import frc.robot.subsystems.drive.DriveConfig.ModuleK.ModuleConfig;
-import static frc.robot.subsystems.drive.DriveConfig.kOdometryFrequencyHz;
+import frc.robot.subsystems.drive.DriveConstants.ModuleK.Common.DriveMotorK;
+import frc.robot.subsystems.drive.DriveConstants.ModuleK.Common.SteerMotorK;
+import frc.robot.subsystems.drive.DriveConstants.ModuleK.ModuleConfig;
+import static frc.robot.subsystems.drive.DriveConstants.kOdometryFrequencyHz;
 
 public class ModuleIOHardware implements ModuleIO {
 

@@ -12,7 +12,7 @@ import edu.wpi.first.math.util.Units;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
-import static frc.robot.subsystems.drive.DriveConfig.kGyroPort;
+import static frc.robot.subsystems.drive.DriveConstants.kGyroPort;
 
 public class GyroIOHardware implements GyroIO {
     private final Pigeon2 m_pigeon = new Pigeon2(kGyroPort);

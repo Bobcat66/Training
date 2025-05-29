@@ -6,7 +6,7 @@ import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.util.Units;
 
 // Constants directly needed for the subsystem. The global driveconstants class contains drive constants that are not directly associated with setting up the subsystem
-public final class DriveConfig {
+public final class DriveConstants {
 
     public static final int kOdometryFrequencyHz = 250;
     public static final int kGyroPort = 9;

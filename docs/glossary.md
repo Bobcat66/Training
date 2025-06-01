@@ -35,3 +35,24 @@ These are terms commonly used in FRC programming
 - Pose Estimation: Pose Estimation is the task of determining a robot's position on the field. Being able to do it well is essential for pretty much any sort of automation
 
 - Th PnP Problem: The PnP Problem is an extremely important problem in computer vision, which, massively oversimplified, essentially asks the question "If you have a picture of an object with a known location, can you deduce the location of the camera that took it?"
+
+- Factor Graph: A bipartite graph representing the factorization of a probability distribution function. They are commonly utilized in computer vision and robotics to break up complex problems into smaller parts that are easier to solve.
+
+- Kalman Filter: A more computationally efficient (albeit less accurate) pose estimation algorithm used by WPILib for on-RIO pose estimation, at least when compared to Factor-Graph based solutions
+
+- Control Systems: A control system is an algorithm used to control a mechanism on the robot
+
+- Plant: The system being controlled by a control system
+
+- Setpoint: The desired state of a plant
+
+- Process Variable: The actual state of a plant
+
+- Error: The difference between the setpoint and the process variable
+
+- PID: PID, or Proportional-Integral-Derivative, is by far the most common control system utilized in FRC. A PID controller can be fully described by three coefficients: the proportional coefficient $K_p$, the integral coefficient $K_i$, and the derivative coefficient $K_d$. A PID controller's output at time t is described by the following equation: 
+$$K_pe(t) + K_i\int e(t)dt + K_d\frac{de}{dt}$$
+
+
+
+

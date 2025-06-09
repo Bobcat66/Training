@@ -21,10 +21,11 @@ import static frc.robot.Constants.TeleopDriveK.kMaxLinearSpeed;
 import frc.robot.SystemConfig.Aliases.Mode;
 import frc.robot.commands.DriveCommands;
 import frc.robot.subsystems.drive.Drive;
-import frc.robot.subsystems.drive.DriveConstants.ModuleK.ModuleConfig;
 import frc.robot.subsystems.drive.GyroIOHardware;
+import frc.robot.subsystems.drive.DriveConstants.ModuleK.ModuleConfig;
 import frc.robot.subsystems.drive.Module;
 import frc.robot.subsystems.drive.ModuleIOHardware;
+import frc.robot.utils.VirtualSubsystem;
 
 public class Robot extends LoggedRobot {
 
@@ -87,6 +88,7 @@ public class Robot extends LoggedRobot {
 
     @Override
     public void robotPeriodic() {
+        VirtualSubsystem.periodicAll();
         CommandScheduler.getInstance().run();
     }
 

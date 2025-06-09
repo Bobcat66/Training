@@ -104,7 +104,6 @@ public class OdometryThread {
         }
         successfulDaqs.incrementAndGet();
         samplesSinceLastPoll.incrementAndGet(); //All queues are GUARANTEED to have at least samplesSinceLastPoll elements in them, all correctly ordered
-
     }
 
     /** This method should be called ONCE per main-cycle thread. Returns an array of odometry timestamps, in seconds */

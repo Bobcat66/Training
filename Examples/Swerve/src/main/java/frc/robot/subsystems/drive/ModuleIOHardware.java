@@ -24,6 +24,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Angle;
 import frc.robot.subsystems.drive.DriveConstants.ModuleK.Common.DriveMotorK;
 import frc.robot.subsystems.drive.DriveConstants.ModuleK.Common.SteerMotorK;
+import frc.robot.subsystems.drive.ModuleIO.ModuleIOData;
+import frc.robot.subsystems.drive.ModuleIO.ModuleIOInputs;
+import frc.robot.subsystems.drive.DriveConstants.ModuleK;
 import frc.robot.subsystems.drive.DriveConstants.ModuleK.ModuleConfig;
 import static frc.robot.subsystems.drive.DriveConstants.kOdometryFrequencyHz;
 
@@ -200,5 +203,4 @@ public class ModuleIOHardware implements ModuleIO {
         );
     }
 
-    
 }

@@ -12,6 +12,9 @@ import edu.wpi.first.math.util.Units;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import frc.robot.subsystems.drive.GyroIO.GyroIOData;
+import frc.robot.subsystems.drive.GyroIO.GyroIOInputs;
+
 import static frc.robot.subsystems.drive.DriveConstants.kGyroPort;
 import static frc.robot.subsystems.drive.DriveConstants.kOdometryFrequencyHz;
 
